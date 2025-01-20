@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from ..models import User
-from ..crud import get_user, create_user
+from ..crud import get_user_by_id, create_user, verify_password, get_user_by_name
 from ..database import get_db
 import json
 
@@ -12,7 +12,7 @@ db = next(get_db())
 async def get_user_by_username(request: Request):
     try:
         data = await get_and_validate_data_from_json_obj(request)
-        user = get_user(db, data.get('user_id'))
+        user = get_user_by_id(db, data.get('user_id'))
         if user is not None:
             return user_to_json(user), 200
         else:
@@ -26,7 +26,25 @@ async def get_user_by_username(request: Request):
             status_code=500,
             content={"error": "Internal server error", "detail": str(e)}
         )
+
+@router.post("/login/")
+async def login(request: Request):
+    try:
+        data = await get_and_validate_data_from_json_obj(request)
+        user = get_user_by_name(db, data.get("username"))
+        if user is not None and verify_password(data.get("password"), user.password):
+            return user_to_json(user), 200
+        else:
+            raise HTTPException(status_code=400, detail = "user not found")
     
+    except HTTPException as e:
+        raise e  
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Internal server error", "detail": str(e)}
+        )
 
 @router.post("/register/")
 async def create_new_user(request: Request):

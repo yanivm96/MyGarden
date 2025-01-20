@@ -18,8 +18,11 @@ def create_user(db: Session, username: str, password: str) -> User:
         raise ValueError(f"Username '{username}' already exists.")
     return user
 
-def get_user(db: Session, id: int) -> User:
+def get_user_by_id(db: Session, id: int) -> User:
     return db.query(User).filter(User.id == id).first()
+
+def get_user_by_name(db: Session, username: str) -> User:
+    return db.query(User).filter(User.username == username).first()
 
 def create_new_plant(db: Session, plant_name: str, user_id: int ,plant_description: str, image_base64: str, watering: str, sunny_hours: int) -> Plant:
     validate_input_fields([plant_name, user_id, plant_description, image_base64, watering, sunny_hours])
@@ -53,3 +56,6 @@ def validate_input_fields(inputs: list):
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
