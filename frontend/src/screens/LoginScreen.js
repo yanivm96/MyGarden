@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LoginUser } from '../../services/api';
 
 const LoginScreen = ({ navigation }) => {
@@ -10,6 +11,7 @@ const LoginScreen = ({ navigation }) => {
     try {
         console.log(username, password);
         const data = await LoginUser(username, password);
+        await AsyncStorage.setItem('access_token', data.access_token);
         console.log('User Login:', data);
         if (data[1] == 200){
             alert('Login successful!');

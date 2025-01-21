@@ -1,18 +1,30 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, HTTPException, Request, status, Depends
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
+from jose import jwt, JWTError
 from ..models import User
 from ..crud import get_user_by_id, create_user, verify_password, get_user_by_name
 from ..database import get_db
+from ...utils import create_access_token
 import json
+import os
 
 router = APIRouter()
 db = next(get_db())
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+
 
 @router.get("/user/")
-async def get_user_by_username(request: Request):
+async def get_user_by_username(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     try:
-        data = await get_and_validate_data_from_json_obj(request)
-        user = get_user_by_id(db, data.get('user_id'))
+        #data = await get_and_validate_data_from_json_obj(request)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        user = get_user_by_name(db, username)
         if user is not None:
             return user_to_json(user), 200
         else:
@@ -20,6 +32,9 @@ async def get_user_by_username(request: Request):
     
     except HTTPException as e:
         raise e  
+    
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     except Exception as e:
         return JSONResponse(
@@ -33,10 +48,15 @@ async def login(request: Request):
         data = await get_and_validate_data_from_json_obj(request)
         user = get_user_by_name(db, data.get("username"))
         if user is not None and verify_password(data.get("password"), user.password):
-            return user_to_json(user), 200
+            access_token = create_access_token(data={"sub": data.get("username")})
+
+            return {"access_token": access_token,
+                     "token_type": "bearer",
+                     "user": user}, 200
         else:
             raise HTTPException(status_code=400, detail = "user not found")
-    
+
+
     except HTTPException as e:
         raise e  
 

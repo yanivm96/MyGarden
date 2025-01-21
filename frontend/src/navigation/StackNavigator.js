@@ -10,6 +10,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="LoadingScreen" component={LoadingScreen} options={{ headerShown: false }} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
     </Stack.Navigator>
