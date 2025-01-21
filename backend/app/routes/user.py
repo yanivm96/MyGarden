@@ -18,7 +18,6 @@ ALGORITHM = os.getenv("ALGORITHM")
 @router.get("/user/")
 async def get_user_by_username(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     try:
-        #data = await get_and_validate_data_from_json_obj(request)
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
@@ -41,6 +40,33 @@ async def get_user_by_username(token: str = Depends(OAuth2PasswordBearer(tokenUr
             status_code=500,
             content={"error": "Internal server error", "detail": str(e)}
         )
+
+@router.post("/token_login/")
+async def login(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        user = get_user_by_name(db, username)
+        if user is not None:
+            return user_to_json(user), 200
+        else:
+            raise HTTPException(status_code=400, detail = "user not found")
+    
+    except HTTPException as e:
+        raise e  
+    
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Internal server error", "detail": str(e)}
+        )
+
 
 @router.post("/login/")
 async def login(request: Request):
@@ -103,5 +129,6 @@ async def get_and_validate_data_from_json_obj(request: json) -> dict:
     is_valid , key = validate_json_fields(data)
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} must not be empty.")
-    
+        
     return data
+    

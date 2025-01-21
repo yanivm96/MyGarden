@@ -12,7 +12,7 @@ const HomeScreen = ({ navigation }) => {
       />
       <Button
         title="Login"
-        onPress={() => navigation.navigate('Login')}
+        onPress={() => navigation.navigate('LoadingScreen')}
       />
       </View>
     </View>
