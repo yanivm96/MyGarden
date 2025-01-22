@@ -1,11 +1,7 @@
-import React from 'react';
+import React from "react";
 
-function ProfileScreen(props) {
-    return (
-        <div>
-            
-        </div>
-    );
-}
+const ProfileScreen = (props) => {
+  return <div></div>;
+};
 
 export default ProfileScreen;

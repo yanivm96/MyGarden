@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, HTTPException, Request, status, Depends
+from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
+from jose import jwt, JWTError
 from ..database import get_db
 from ..models import Plant
-from ..crud import get_plant, get_all_user_plants, create_new_plant
+from ..crud import get_plant, get_all_user_plants, create_new_plant, get_user_by_name
 import httpx
 import os
 import openai
@@ -12,6 +14,8 @@ import re
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 PLANTID_API_KEY = os.getenv("PLANTID_API_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
 
 router = APIRouter()
 db = next(get_db())
@@ -99,11 +103,18 @@ async def get_chatgpt_response(plant_name : str) -> str:
 
 
 
-@router.post("/add_new_plant")
-async def add_new_plant(request: Request):
+@router.post("/add_new_plant") 
+async def add_new_plant(request: Request, token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     try:
         data = await get_and_validate_data_from_json_obj(request)
-        plant_name = await identify_plant(data.get('image_base64'), data.get('latitude'), data.get('longitude'))
+        image_base64 = check_base64(data)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        user = get_user_by_name(db, username)
+        plant_name = await identify_plant(image_base64, data.get('latitude'), data.get('longitude'))
         plant_data = await get_chatgpt_response(plant_name)
         sunny_hours = 0
         if type(plant_data.get("sunny_hours")) is not int:
@@ -113,12 +124,12 @@ async def add_new_plant(request: Request):
 
         if plant_data:
             plant = create_new_plant(
-                db, plant_name, data.get('user_id'), plant_data.get("description"), data.get('image_base64'),
+                db, plant_name, user.id, plant_data.get("description"), data.get('image_base64'),
                 plant_data.get('watering'), sunny_hours
             )
 
             if plant:
-                return {"success": "Plant has been added"}
+                return {"success": "Plant has been added"}, 200
             else:
                 raise HTTPException(status_code=400, detail="Error occurred while creating plant")
 
@@ -130,6 +141,15 @@ async def add_new_plant(request: Request):
             content={"error": "Internal server error", "detail": str(e)}
         )
 
+
+def check_base64(data: dict):
+    base64 = data.get('image_base64')
+    if data.get('image_base64') is None:
+        raise HTTPException(status_code=400, detail="image_base64 must not be empty")
+    elif not data.get('image_base64').startswith("data:image"):
+        base64 = f"data:image/jpeg;base64,{base64}"
+    
+    return base64
 
 @router.get("/plant")
 async def get_plant_by_id(request: Request):
