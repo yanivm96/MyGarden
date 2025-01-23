@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import {
   View,
-  Button,
   Image,
   StyleSheet,
   Alert,
   Text,
+  TouchableOpacity,
   Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { SendPhoto } from "../../services/api";
 
-const CameraScreen = () => {
+const CameraScreen = ({ navigation }) => {
   const [imageUri, setImageUri] = useState(null);
   const [base64, setBase64] = useState(null);
 
@@ -63,23 +64,43 @@ const CameraScreen = () => {
     }
   };
 
-  const send = () => {
+  const saveToGarden = () => {
     if (base64) {
-      Alert.alert("Base64", `Base64 Length: ${base64.length}`);
-      
+      Alert.alert("Saved!", "Your photo has been saved to your garden.");
+      SendPhoto(base64);
+      goBack();
     } else {
       Alert.alert("Error", "No photo taken yet!");
     }
   };
 
+  const goBack = () => {
+    navigation.navigate("User");
+  };
+
   return (
     <View style={styles.container}>
-      <Button title="Take Photo" onPress={takePhoto} />
+      <Text style={styles.title}>Capture Your Plant</Text>
+
+      <TouchableOpacity style={styles.cameraButton} onPress={takePhoto}>
+        <Icon name="camera" size={50} color="#FFFFFF" />
+        <Text style={styles.buttonText}>Take Photo</Text>
+      </TouchableOpacity>
+
       {imageUri && <Image source={{ uri: imageUri }} style={styles.image} />}
-      {base64 && (
-        <Text style={styles.text}>Base64 Length: {base64.length}</Text>
+
+      {imageUri && (
+        <View style={styles.actionsContainer}>
+          <TouchableOpacity style={styles.saveButton} onPress={saveToGarden}>
+            <Icon name="content-save" size={30} color="#FFFFFF" />
+            <Text style={styles.buttonText}>Save to Garden</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.cancelButton} onPress={goBack}>
+            <Icon name="close-circle" size={30} color="#FFFFFF" />
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
       )}
-      <Button title="send" onPress={send} />
     </View>
   );
 };
@@ -90,17 +111,68 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-    backgroundColor: "transparent",
+    backgroundColor: "#F4E1C4", // רקע נעים
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#006D5B",
+    marginBottom: 20,
+  },
+  cameraButton: {
+    backgroundColor: "#006D5B", // ירוק כהה
+    width: 150,
+    height: 150,
+    borderRadius: 75, // עיגול מושלם
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    elevation: 5,
   },
   image: {
     width: 200,
     height: 200,
     marginTop: 20,
-    borderRadius: 10,
+    borderRadius: 10, // פינות מעוגלות לתמונה
+    borderWidth: 2,
+    borderColor: "#006D5B", // מסגרת ירוקה
   },
-  text: {
+  actionsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 20,
-    color: "gray",
+    width: "100%",
+    paddingHorizontal: 20,
+  },
+  saveButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2ABF88", // ירוק בהיר
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    flex: 1,
+    marginRight: 10,
+    elevation: 5,
+  },
+  cancelButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#E57373", // אדום
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    flex: 1,
+    marginLeft: 10,
+    elevation: 5,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "bold",
+    marginLeft: 10,
   },
 });
 
