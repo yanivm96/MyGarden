@@ -98,3 +98,24 @@ export const SendPhoto = async (image_base64) => {
     throw error;
   }
 };
+
+export const getPlants = async () => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${API_URL}/user_plants/`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to get plants");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error(error.message);
+    throw error;
+  }
+};

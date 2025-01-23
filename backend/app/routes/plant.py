@@ -161,6 +161,25 @@ async def get_plant_by_id(request: Request):
         
     except Exception as e:
         return {"error" : str(e)}  
+    
+
+@router.get("/user_plants")
+async def get_plant_by_id(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+
+        user = get_user_by_name(db, username)
+        if user is not None:
+            plants = get_all_user_plants(db, user.id)
+            return [plant_to_json(plant) for plant in plants]
+        else:
+            raise HTTPException(status_code=400, detail = "user not found")
+
+    except Exception as e:
+        return {"error" : str(e)}  
 
 
 
