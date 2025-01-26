@@ -7,9 +7,11 @@ import {
   View,
   Image,
   Text,
+  Alert,
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome5";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import { removePlantFromDB } from "../../services/api";
 
 function getImageUri(base64, mimeType = "image/jpeg") {
   if (!base64) {
@@ -20,7 +22,23 @@ function getImageUri(base64, mimeType = "image/jpeg") {
 }
 
 export default function PlantList({ plants }) {
-  const [saved, setSaved] = useState([]);
+  const removePlant = async (plantId) => {
+    try {
+      console.log(plantId);
+      const response = removePlantFromDB(plantId);
+
+      if (response) {
+        Alert.alert("Success", "Plant removed successfully.");
+      } else {
+        const errorData = await response.json();
+        console.error("Error removing plant:", errorData);
+        Alert.alert("Error", "Failed to remove plant.");
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      Alert.alert("Error", "Failed to connect to the server.");
+    }
+  };
 
   if (!plants || !Array.isArray(plants)) {
     return <Text>No plants available.</Text>;
@@ -47,29 +65,14 @@ export default function PlantList({ plants }) {
             { description, id, image_base64, name, sunny_hours, watering },
             index
           ) => {
-            const isSaved = saved.includes(id);
-
             return (
               <TouchableOpacity key={id} onPress={() => {}}>
                 <View style={styles.card}>
                   {/* Like Button */}
                   <View style={styles.cardLikeWrapper}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        setSaved((prev) =>
-                          isSaved
-                            ? prev.filter((val) => val !== id)
-                            : [...prev, id]
-                        )
-                      }
-                    >
-                      <View style={styles.cardLike}>
-                        <FontAwesome
-                          color={isSaved ? "#ea266d" : "#222"}
-                          name="heart"
-                          solid={isSaved}
-                          size={20}
-                        />
+                    <TouchableOpacity onPress={() => removePlant(id)}>
+                      <View style={styles.cardRemove}>
+                        <FontAwesome color="#ea266d" name="trash" size={20} />
                       </View>
                     </TouchableOpacity>
                   </View>

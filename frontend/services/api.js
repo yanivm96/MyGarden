@@ -10,6 +10,33 @@ export const getToken = async () => {
   return await AsyncStorage.getItem("access_token");
 };
 
+export const isUserLogin = async () => {
+  try {
+    let res = false;
+    const token = await AsyncStorage.getItem("access_token");
+    if (!token) {
+      return false;
+    }
+
+    const response = await fetch(`${API_URL}/token_login/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      res = true;
+    } else {
+      await AsyncStorage.removeItem("access_token");
+    }
+  } catch (error) {
+    console.error("Error checking token:", error);
+  }
+  
+  return res;
+};
+
 export const checkToken = async (navigation) => {
   try {
     const token = await AsyncStorage.getItem("access_token");
@@ -114,6 +141,28 @@ export const getPlants = async () => {
     }
 
     return await response.json();
+  } catch (error) {
+    console.error(error.message);
+    throw error;
+  }
+};
+
+export const removePlantFromDB = async (plantId) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${API_URL}/plant/`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ plant_id: plantId }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to remove plant");
+    }
+
+    return true;
   } catch (error) {
     console.error(error.message);
     throw error;

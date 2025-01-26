@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { LoginUser, saveToken } from "../../services/api"; // ודא שהפונקציות קיימות
+import { LoginUser, saveToken } from "../../services/api"; 
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUserName] = useState("");
@@ -19,12 +19,12 @@ const LoginScreen = ({ navigation }) => {
       console.log(username, password);
       const data = await LoginUser(username, password);
 
-      saveToken(data[0].access_token); // שמירת הטוקן
+      saveToken(data[0].access_token); 
       console.log(data[0].access_token);
 
       if (data[1] === 200) {
         Alert.alert("Success", "Login successful!");
-        navigation.navigate("User"); // ניווט לעמוד המשתמש
+        navigation.navigate("User"); 
       } else {
         throw new Error("Login failed");
       }

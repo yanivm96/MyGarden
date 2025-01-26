@@ -44,6 +44,12 @@ def get_plant(db:Session, id: int) -> Plant:
 def get_all_user_plants(db:Session, user_id) -> list:
     return db.query(Plant).filter(Plant.user_id == user_id).all()
 
+def delete_plant(db:Session, id: int) -> Plant:
+    plant = db.query(Plant).filter(Plant.id == id).first()
+    db.delete(plant)
+    db.commit()
+    return plant
+
 
 def validate_input_fields(inputs: list):
     for input in inputs:

@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from jose import jwt, JWTError
 from ..database import get_db
 from ..models import Plant
-from ..crud import get_plant, get_all_user_plants, create_new_plant, get_user_by_name
+from ..crud import get_plant, get_all_user_plants, create_new_plant, get_user_by_name, delete_plant
 import httpx
 import os
 import openai
@@ -49,24 +49,6 @@ async def identify_plant(image_base64: str, latitude: float = None, longitude: f
         raise HTTPException(status_code=response.status_code, detail="Failed to identify plant")
     
 
-# async def identify_plant(plant_name):
-#     try:
-#         if plant_name is not None:
-#             return {"plant_name": plant_name, 
-#                     "info": get_chatgpt_response(plant_name)}, 200
-#         else:
-#             return {"error": "invalid plant name"}, 400
-
-#     except HTTPException as e:
-#         raise e  
-
-#     except Exception as e:
-#         return JSONResponse(
-#             status_code=500,
-#             content={"error": "Internal server error", "detail": str(e)}
-#         )
-    
-
 async def get_chatgpt_response(plant_name : str) -> str:
     prompt = f"""
     You are a gardening expert assistant.
@@ -101,19 +83,22 @@ async def get_chatgpt_response(plant_name : str) -> str:
         raise ValueError("Response format from gpt is incorrect")
 
 
-
+def get_user_from_token(token: str) -> str:
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    username = payload.get("sub")
+    if username is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = get_user_by_name(db, username)
+    
+    return user
 
 @router.post("/add_new_plant") 
 async def add_new_plant(request: Request, token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     try:
         data = await get_and_validate_data_from_json_obj(request)
         image_base64 = check_base64(data)
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        
-        user = get_user_by_name(db, username)
+        user = get_user_from_token(token)
         plant_name = await identify_plant(image_base64, data.get('latitude'), data.get('longitude'))
         plant_data = await get_chatgpt_response(plant_name)
         sunny_hours = 0
@@ -163,15 +148,30 @@ async def get_plant_by_id(request: Request):
         return {"error" : str(e)}  
     
 
+@router.delete("/plant")
+async def delete_plant_by_id(request: Request, token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
+    try:
+        data = await get_and_validate_data_from_json_obj(request)
+        user = get_user_from_token(token)
+        if user is not None:
+            plant = delete_plant(db, data.get("plant_id"))
+            if plant is not None:
+                return {"success": "Plant has been deleted"}, 200
+            
+            else:
+                raise HTTPException(status_code=400, detail="Plant not found")
+
+        else:
+            raise HTTPException(status_code=400, detail="User not found")
+    
+    except Exception as e:
+        return {"error" : str(e)}  
+    
+
 @router.get("/user_plants")
 async def get_plant_by_id(token: str = Depends(OAuth2PasswordBearer(tokenUrl="login"))):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-
-        user = get_user_by_name(db, username)
+        user = get_user_from_token(token)
         if user is not None:
             plants = get_all_user_plants(db, user.id)
             return [plant_to_json(plant) for plant in plants]
@@ -180,7 +180,6 @@ async def get_plant_by_id(token: str = Depends(OAuth2PasswordBearer(tokenUrl="lo
 
     except Exception as e:
         return {"error" : str(e)}  
-
 
 
 async def get_and_validate_data_from_json_obj(request: json) -> dict:
