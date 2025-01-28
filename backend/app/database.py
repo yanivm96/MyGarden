@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 import os
 
-load_dotenv(dotenv_path="/home/ubuntu/MyGarden/MyGarden/backend/.env")
+load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 

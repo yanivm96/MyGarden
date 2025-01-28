@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException, Request, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import JSONResponse
 from jose import jwt, JWTError
-from ..database import get_db
-from ..models import Plant
-from ..crud import get_plant, get_all_user_plants, create_new_plant, get_user_by_name, delete_plant
+from database import get_db
+from models import Plant
+from crud import get_plant, get_all_user_plants, create_new_plant, get_user_by_name, delete_plant
 import httpx
 import os
 import openai

@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: yaniv0811
+      POSTGRES_USER: postgres
+      POSTGRES_DB: plant_db
+    ports:
+      - "5432:5432"
+    networks:
+      - mynetwork
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+
+  web:
+    build: .
+    command: sh -c "sleep 10 && uvicorn main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    networks:
+      - mynetwork
+    environment:
+      - DATABASE_URL=postgresql://postgres:yaniv0811@postgres:5432/plant_db
+
+networks:
+  mynetwork:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local

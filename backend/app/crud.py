@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from .models import User, Plant
+from models import User, Plant
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
