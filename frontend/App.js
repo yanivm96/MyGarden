@@ -1,7 +1,7 @@
 import React from "react";
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { StyleSheet } from "react-native";
-import TabNavigator from "./src/navigation/TabNavigator";
+import StackNavigator from "./src/navigation/StackNavigator";
 
 const MyTheme = {
   ...DefaultTheme,
@@ -14,9 +14,8 @@ const MyTheme = {
 const App = () => {
   return (
     <NavigationContainer theme={MyTheme}>
-      <TabNavigator />
+      <StackNavigator />
     </NavigationContainer>
   );
 };
-
 export default App;

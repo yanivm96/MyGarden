@@ -12,6 +12,7 @@ import {
 import FontAwesome from "react-native-vector-icons/FontAwesome5";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import { removePlantFromDB } from "../../services/api";
+import PlantModal from "./PlantModal";
 
 function getImageUri(base64, mimeType = "image/jpeg") {
   if (!base64) {
@@ -22,6 +23,19 @@ function getImageUri(base64, mimeType = "image/jpeg") {
 }
 
 export default function PlantList({ plants }) {
+  const [selectedPlant, setSelectedPlant] = useState(null);
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const openModal = (plant) => {
+    setSelectedPlant(plant);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedPlant(null);
+  };
+
   const removePlant = async (plantId) => {
     try {
       console.log(plantId);
@@ -46,6 +60,11 @@ export default function PlantList({ plants }) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f2f2f2" }}>
+      <PlantModal
+        visible={isModalVisible}
+        onClose={closeModal}
+        plant={selectedPlant}
+      />
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerTop}>
@@ -66,9 +85,21 @@ export default function PlantList({ plants }) {
             index
           ) => {
             return (
-              <TouchableOpacity key={id} onPress={() => {}}>
+              <TouchableOpacity
+                key={id}
+                onPress={() => {
+                  openModal({
+                    description,
+                    id,
+                    image_base64,
+                    name,
+                    sunny_hours,
+                    watering,
+                  });
+                }}
+              >
                 <View style={styles.card}>
-                  {/* Like Button */}
+                  {/* remove Button */}
                   <View style={styles.cardLikeWrapper}>
                     <TouchableOpacity onPress={() => removePlant(id)}>
                       <View style={styles.cardRemove}>

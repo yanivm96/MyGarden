@@ -24,15 +24,9 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.loginButton]}
-          onPress={() => navigation.navigate("LoadingScreen")}
+          onPress={() => navigation.navigate("Login")}
         >
           <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.cameraButton]}
-          onPress={() => navigation.navigate("Camera")}
-        >
-          <Text style={styles.buttonText}>Camera</Text>
         </TouchableOpacity>
       </View>
     </View>

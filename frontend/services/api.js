@@ -12,7 +12,7 @@ export const getToken = async () => {
 
 export const isUserLogin = async () => {
   try {
-    let res = false;
+    var res = false;
     const token = await AsyncStorage.getItem("access_token");
     if (!token) {
       return false;
@@ -33,7 +33,7 @@ export const isUserLogin = async () => {
   } catch (error) {
     console.error("Error checking token:", error);
   }
-  
+
   return res;
 };
 

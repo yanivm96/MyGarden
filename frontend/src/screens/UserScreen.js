@@ -1,10 +1,25 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const UserScreen = ({ navigation }) => {
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("access_token");
+      console.log("Token cleared");
+      navigation.navigate("Home");
+    } catch (error) {
+      console.error("Failed to clear token:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
+      {/* Logout Button in Top Right */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Icon name="logout" size={20} color="#FFFFFF" />
+      </TouchableOpacity>
       <Text style={styles.welcomeText}>Welcome Back, Plant Lover!</Text>
       <Text style={styles.subtitle}>What would you like to do today?</Text>
       <View style={styles.actionContainer}>
@@ -19,7 +34,7 @@ const UserScreen = ({ navigation }) => {
         {/* My Plants */}
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => navigation.navigate("MyPlants")}
+          onPress={() => navigation.navigate("ProfileScreen")}
         >
           <Icon name="leaf" size={50} color="#FFFFFF" style={styles.icon} />
           <Text style={styles.buttonText}>View My Plants</Text>
@@ -86,6 +101,21 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  buttonText: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  logoutButton: {
+    position: "absolute", // למיקום בפינה
+    top: 20, // מרווח מהחלק העליון
+    right: 20, // מרווח מהצד הימני
+    backgroundColor: "#D9534F",
+    borderRadius: 10,
+    padding: 5,
+    elevation: 5,
   },
 });
 

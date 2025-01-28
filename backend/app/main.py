@@ -11,10 +11,10 @@ app = FastAPI(debug= True)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # מאפשר לכל המקורות (או רשום דומיינים ספציפיים)
+    allow_origins=["*"],  
     allow_credentials=True,
-    allow_methods=["*"],  # מאפשר את כל סוגי הבקשות (GET, POST, PUT, DELETE וכו')
-    allow_headers=["*"],  # מאפשר את כל סוגי הכותרות
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
 app.include_router(user_router)
 app.include_router(plant_router)
