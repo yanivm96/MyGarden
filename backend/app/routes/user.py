@@ -5,7 +5,7 @@ from jose import jwt, JWTError
 from ..models import User
 from ..crud import get_user_by_id, create_user, verify_password, get_user_by_name
 from ..database import get_db
-from ...utils import create_access_token
+from ..utils import create_access_token
 import json
 import os
 
