@@ -1,25 +1,17 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from database import engine, Base, get_db
-from crud import create_user, get_user_by_id
-from routes.plant import router as plant_router 
-from routes.user import router as user_router 
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.routes import user_router, plant_router
+from app.core.config import settings
 
-
-app = FastAPI(debug= False)
+app = FastAPI(debug=settings.DEBUG)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],  
-    allow_headers=["*"],  
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-app.include_router(user_router)
-app.include_router(plant_router)
 
-
-Base.metadata.create_all(bind=engine)
-
-
+app.include_router(user_router, tags=["User"])
+app.include_router(plant_router, tags=["Plant"])

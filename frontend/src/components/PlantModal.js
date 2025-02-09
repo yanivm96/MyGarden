@@ -25,7 +25,7 @@ export default function PlantModal({ visible, onClose, plant }) {
           <Image
             source={{
               uri: plant.image_base64
-                ? `data:image/jpeg;base64,${plant.image_base64}`
+                ? `${plant.image_base64}`
                 : "https://via.placeholder.com/160",
             }}
             style={styles.modalImage}
@@ -88,9 +88,9 @@ const styles = StyleSheet.create({
   },
   modalImage: {
     width: "100%",
-    height: 300, 
+    height: 300,
     marginBottom: 16,
-    backgroundColor: "#f2f2f2", 
+    backgroundColor: "#f2f2f2",
   },
   modalDetails: {
     padding: 16,

@@ -75,7 +75,7 @@ const CameraScreen = ({ navigation }) => {
   };
 
   const goBack = () => {
-    navigation.navigate("User");
+    navigation.replace("User");
   };
 
   return (

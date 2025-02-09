@@ -1,5 +1,11 @@
 import React from "react";
-import { View, TouchableOpacity, StyleSheet, Text } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Text,
+  SafeAreaView,
+} from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -15,45 +21,47 @@ const UserScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Logout Button in Top Right */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Icon name="logout" size={20} color="#FFFFFF" />
-      </TouchableOpacity>
-      <Text style={styles.welcomeText}>Welcome Back, Plant Lover!</Text>
-      <Text style={styles.subtitle}>What would you like to do today?</Text>
-      <View style={styles.actionContainer}>
-        {/* Identify a New Plant */}
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate("Camera")}
-        >
-          <Icon name="camera" size={50} color="#FFFFFF" style={styles.icon} />
-          <Text style={styles.buttonText}>Identify New Plant</Text>
+    <SafeAreaView>
+      <View style={styles.container}>
+        {/* Logout Button in Top Right */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Icon name="logout" size={20} color="#FFFFFF" />
         </TouchableOpacity>
-        {/* My Plants */}
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate("ProfileScreen")}
-        >
-          <Icon name="leaf" size={50} color="#FFFFFF" style={styles.icon} />
-          <Text style={styles.buttonText}>View My Plants</Text>
-        </TouchableOpacity>
-        {/* Explore Tips */}
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => navigation.navigate("Tips")}
-        >
-          <Icon
-            name="lightbulb-on"
-            size={50}
-            color="#FFFFFF"
-            style={styles.icon}
-          />
-          <Text style={styles.buttonText}>Explore Gardening Tips</Text>
-        </TouchableOpacity>
+        <Text style={styles.welcomeText}>Welcome Back, Plant Lover!</Text>
+        <Text style={styles.subtitle}>What would you like to do today?</Text>
+        <View style={styles.actionContainer}>
+          {/* Identify a New Plant */}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate("Camera")}
+          >
+            <Icon name="camera" size={50} color="#FFFFFF" style={styles.icon} />
+            <Text style={styles.buttonText}>Identify New Plant</Text>
+          </TouchableOpacity>
+          {/* My Plants */}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate("ProfileScreen")}
+          >
+            <Icon name="leaf" size={50} color="#FFFFFF" style={styles.icon} />
+            <Text style={styles.buttonText}>View My Plants</Text>
+          </TouchableOpacity>
+          {/* Explore Tips */}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => navigation.navigate("Tips")}
+          >
+            <Icon
+              name="lightbulb-on"
+              size={50}
+              color="#FFFFFF"
+              style={styles.icon}
+            />
+            <Text style={styles.buttonText}>Explore Gardening Tips</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

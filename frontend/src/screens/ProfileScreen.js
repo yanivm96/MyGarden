@@ -15,6 +15,7 @@ const ProfileScreen = () => {
           setLoading(true);
           const data = await getPlants();
           setPlants(data);
+          console.log("Plants:", data);
         } catch (error) {
           console.error("Error fetching plants:", error);
         } finally {

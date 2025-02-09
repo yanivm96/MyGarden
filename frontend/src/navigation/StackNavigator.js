@@ -65,7 +65,7 @@ const StackNavigator = () => {
       <Stack.Screen
         name="User"
         component={UserScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <Stack.Screen
         name="Camera"

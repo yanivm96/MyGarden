@@ -1,12 +1,7 @@
 import React, { useEffect } from "react";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { checkToken } from "../../services/api";
 
-const LoadingScreen = ({ navigation }) => {
-  useEffect(() => {
-    checkToken(navigation);
-  }, [navigation]);
-
+const LoadingScreen = ({}) => {
   return (
     <View style={styles.container}>
       <ActivityIndicator size="large" color="#0000ff" />

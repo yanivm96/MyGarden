@@ -19,7 +19,8 @@ function getImageUri(base64, mimeType = "image/jpeg") {
     console.warn("Base64 string is missing or invalid.");
     return "https://via.placeholder.com/160";
   }
-  return `data:${mimeType};base64,${base64}`;
+  console.log(base64);
+  return base64;
 }
 
 export default function PlantList({ plants }) {

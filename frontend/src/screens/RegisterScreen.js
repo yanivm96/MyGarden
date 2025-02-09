@@ -8,7 +8,7 @@ import {
   Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { registerUser } from "../../services/api"; // ודא שהפונקציה registerUser קיימת
+import { registerUser } from "../../services/api";
 
 const RegisterScreen = ({ navigation }) => {
   const [username, setUserName] = useState("");
@@ -25,12 +25,8 @@ const RegisterScreen = ({ navigation }) => {
       console.log(username, password);
       const data = await registerUser(username, password);
       console.log("User registered:", data);
-      if (data[1] === 200) {
-        Alert.alert("Success", "Registration successful!");
-        navigation.navigate("Login");
-      } else {
-        throw new Error("Registration failed");
-      }
+      Alert.alert("Success", "Registration successful!");
+      navigation.navigate("Login");
     } catch (error) {
       Alert.alert("Error", "Registration failed. Please try again.");
     }
