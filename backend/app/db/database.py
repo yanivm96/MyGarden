@@ -6,11 +6,8 @@ from sqlalchemy_utils import database_exists, create_database
 from app.core.config import settings
 import os
 
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
 
 engine = create_engine(settings.DATABASE_URL, echo=settings.DEBUG)
-
 
 try:
     if not database_exists(engine.url):
@@ -26,8 +23,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def init_db():
-    from app.models import Base  
+    from app.models import Base
     Base.metadata.create_all(bind=engine)
+
+init_db() 
 
 def get_db():
     db = SessionLocal()
