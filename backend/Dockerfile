@@ -1,8 +1,12 @@
 FROM python:3.9-slim
 
+RUN apt-get update && apt-get install -y git libpq-dev && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-COPY . /app
+RUN git clone https://github.com/yanivm96/MyGarden.git /app
+
+WORKDIR /app/backend
 
 RUN pip install --no-cache-dir -r requirements.txt
 
